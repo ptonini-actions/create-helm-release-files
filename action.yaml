@@ -1,4 +1,4 @@
-name: create-helm-release-files
+name: generate-helm-releases
 description: ''
 inputs:
   environment:
@@ -8,13 +8,10 @@ inputs:
     description: ''
     default: ''
     required: false
-  manifest_file:
+  manifest:
     description: ''
     required: true
-  manifest_macros:
-    description: ''
-    required: false
-  rp_manifest_file:
+  release_please_manifest:
     description: ''
     required: true
   container_registry:
@@ -63,8 +60,6 @@ inputs:
     description: ''
     required: false
     default: volumes,volumeMounts
-
-
 runs:
   using: node16
   main: dist/index.js

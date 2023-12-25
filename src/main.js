@@ -21,8 +21,8 @@ const environment = core.getInput('environment')
 const digest = core.getInput('digest')
 const containerRegistry = core.getInput('container_registry')
 const stagingDomain = core.getInput('staging_domain')
-const manifestFile = core.getInput('manifest_file')
-const rpManifestFile = core.getInput('rp_manifest_file')
+const manifest = core.getInput('manifest_file')
+const releasePleaseManifest = core.getInput('release_please_manifest')
 const ingressBotLabel = core.getInput('ingress_bot_label')
 const ingressBotHostAnnotation = core.getInput('ingress_bot_host_annotation')
 const ingressBotPathAnnotation = core.getInput('ingress_bot_path_annotation')
@@ -49,7 +49,7 @@ async function getManifests(owner, repo, repository_id, environment_name, ref) {
 
     try {
         // Fetch helm manifest
-        const path = manifestFile
+        const path = manifest
         const name = extraValuesVariable
         const {data: {content: content}} = await octokit.rest.repos.getContent({owner, repo, ref, path})
         let manifestStr = Buffer.from(content, 'base64').toString('utf-8')
@@ -80,7 +80,7 @@ async function getManifests(owner, repo, repository_id, environment_name, ref) {
 
     // Fetch release-please manifest
     try {
-        const path = rpManifestFile
+        const path = releasePleaseManifest
         const {data: {content: content}} = await octokit.rest.repos.getContent({owner, repo, ref, path});
         ({'.': version} = yaml.parse(Buffer.from(content, 'base64').toString('utf-8')))
     } catch (e) {
