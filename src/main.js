@@ -19,6 +19,7 @@ const releasePaths = []
 // Inputs
 const environment = core.getInput('environment')
 const digest = core.getInput('digest')
+const tag = core.getInput('tag')
 const containerRegistry = core.getInput('container_registry')
 const stagingDomain = core.getInput('staging_domain')
 const manifest = core.getInput('manifest')
@@ -131,9 +132,9 @@ async function main() {
         core.notice(`Namespace: ${stagingNamespace}`)
 
         // Create current repo release
-        const {values, parameters, version} = await getManifests(owner, repo, repoId, environment, context.payload.pull_request?.head.ref)
+        let {values, parameters, version} = await getManifests(owner, repo, repoId, environment, context.payload.pull_request?.head.ref)
         let stagingReleases = [{values, parameters}]
-        values.image = digest ? `${containerRegistry}/${repo}@${digest}` : `${containerRegistry}/${repo}:${version}`
+        values.image = digest ? `${containerRegistry}/${repo}@${digest}` : `${containerRegistry}/${repo}:${tag ? tag : version}`
 
         // Fetch staging group members
         try {
@@ -155,7 +156,7 @@ async function main() {
             const stagingParameters = {...parameters, ...{namespace: stagingNamespace, extra_args: '--create-namespace'}}
 
             // Edit ingress-bot annotations
-            if ('service' in values && ingressBotLabel in values.service.labels) {
+            if ('service' in values && 'labels' in values.service && ingressBotLabel in values.service.labels) {
                 values.service.annotations[ingressBotHostAnnotation] = stagingHost
                 const line = `${parameters['release_name']}: https://${stagingHost}${values.service.annotations[ingressBotPathAnnotation]}`
                 core.notice(line)

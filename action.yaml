@@ -8,6 +8,10 @@ inputs:
     description: ''
     default: ''
     required: false
+  tag:
+    description: ''
+    default: ''
+    required: false
   manifest:
     description: ''
     required: true
